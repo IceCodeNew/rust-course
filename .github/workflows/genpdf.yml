@@ -1,0 +1,39 @@
+name: Generate PDF
+
+on:
+  push:
+    branches:
+      - main
+      - genpdf
+  workflow_dispatch:
+
+jobs:
+  generate-pdf:
+    name: Generate PDF
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Run genpdf script
+        run: |
+          sudo apt-get update -qq \
+              && sudo apt-get -y install \
+              fonts-wqy-microhei fonts-wqy-zenhei
+          chmod +x ./genpdf.sh
+          ./genpdf.sh
+
+          set -x
+          if ! find . -name "rust-course.pdf" -type f -size +1M -print0 -quit > /dev/null; then
+              echo "ERROR: PDF file not found or too small"
+              exit 1
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: rust-course.pdf
+          name: Latest PDF Release
+          tag_name: edition-${{ github.run_number }}-${{ github.sha }}
+          make_latest: true
