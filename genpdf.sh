@@ -5,7 +5,10 @@
 #   This script write for mdbook project to generate pdf
 ###########################################################
 
-cargo install mdbook mdbook-pdf
+cargo install --git https://github.com/HollowMan6/mdBook mdbook
+cargo install mdbook-pdf
+python3 -m pip install mdbook-pdf-outline
+
 hasPdfSec=$(grep "output.pdf" ./book.toml)
 
 if [ "$hasPdfSec" = "" ]; then
